@@ -8,7 +8,8 @@ runner (submit.py), which keeps the runner's log/returncode/cancel/OOM contract 
   POST /jobs              -> {"request_path": str, "log_path": str} => {"job_id": str} (409 while busy)
   GET  /jobs/<id>         -> {"state": "running"|"done"|"failed", "error": str|None}
   POST /jobs/<id>/cancel  -> the session cannot interrupt the upstream pipeline mid-stage: the process exits and the
-                             entrypoint loop restarts it (the next job pays a cold load, like every job used to)
+                             entrypoint loop restarts it (the next job pays a cold load, like every job used to).
+                             If this request is not answered (a C++ step holds the GIL), the client SIGKILLs `pid`.
 
 While a job runs, fds 1/2 are pointed at the job's log file so the stage log looks exactly like the one-shot path
 (including C++-level prints from cumesh/xatlas). After a failed job the process exits as well, so a job never
@@ -133,7 +134,8 @@ class Handler(BaseHTTPRequestHandler):
             s = STATE["session"]
             return self._json(200, {"state": STATE["state"], "signature": s.signature if s else None,
                                     "load_s": s.load_s if s else None, "jobs_done": s.jobs_done if s else 0,
-                                    "job": STATE["job"], "uptime_s": round(time.time() - STATE["started"], 1)})
+                                    "job": STATE["job"], "pid": os.getpid(),
+                                    "uptime_s": round(time.time() - STATE["started"], 1)})
         if self.path.startswith("/jobs/"):
             rec = JOBS.get(self.path.split("/")[2])
             return self._json(200, rec) if rec else self._json(404, {"error": "unknown job"})
@@ -182,6 +184,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=int(os.environ.get("STUDIO_PIXAL3D_RESIDENT_PORT", "8712")))
     a = ap.parse_args()
+    pid_path = os.environ.get("STUDIO_PIXAL3D_RESIDENT_PID", "/tmp/pixal3d-resident.pid")
+    try:  # submit SIGKILLs this pid if a cancel request is not answered
+        with open(pid_path, "w", encoding="utf-8") as f:
+            f.write(str(os.getpid()))
+    except OSError as e:
+        _log(f"could not write {pid_path}: {e}")
     srv = ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     _log(f"listening on 127.0.0.1:{a.port}; loading the single-view pipeline")

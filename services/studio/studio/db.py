@@ -225,8 +225,12 @@ class JobStore:
                       "attempt=attempt+1 WHERE id=?", (now, now, worker_id, row["id"]))
         return self.get(row["id"])
 
-    def requeue_orphans(self, worker_id: str) -> list[str]:
-        """On worker start: jobs left 'running' by a crashed/restarted worker go back to the queue."""
+    def requeue_orphans(self, worker_id: str) -> tuple[list[str], list[str]]:
+        """On worker start: jobs left 'running' by a crashed/restarted worker go back to the queue.
+
+        Returns (requeued, cancelled). A cancel that was already in flight is finished here and never re-run.
+        Those ids are returned separately: recovery must still stop their stage processes, and an empty requeue
+        list is not the same as "nothing was running"."""
         with self.tx() as c:
             rows = c.execute("SELECT id, cancel_requested FROM jobs WHERE status='running'").fetchall()
             ids = [r["id"] for r in rows if not r["cancel_requested"]]
@@ -240,7 +244,7 @@ class JobStore:
             self.event(i, "warn", f"requeued after worker restart ({worker_id}); completed stages will be reused")
         for i in dropped:
             self.event(i, "warn", f"cancelled (cancel was pending when the worker restarted: {worker_id})")
-        return ids
+        return ids, dropped
 
     def update(self, job_id: str, **fields):
         cols, vals = [], []

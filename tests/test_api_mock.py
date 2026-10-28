@@ -130,8 +130,8 @@ def test_restart_recovery_requeues_running_jobs(env):
     claimed = store.claim_next("worker-A")
     assert claimed["id"] == job and claimed["status"] == "running"
     # simulate a worker crash: a new worker starts and requeues orphans
-    requeued = JobStore().requeue_orphans("worker-B")
-    assert requeued == [job]
+    requeued, cancelled = JobStore().requeue_orphans("worker-B")
+    assert requeued == [job] and cancelled == []
     assert store.get(job)["status"] == "queued"
     again = store.claim_next("worker-B")
     assert again["id"] == job and again["attempt"] == 2
@@ -278,11 +278,79 @@ def test_cancel_then_purge_never_resurrects(env):
     assert client.post(f"/v1/jobs/{job}/cancel").json()["result"] == "cancelling"
     assert client.delete(f"/v1/jobs/{job}?purge=true").json()["result"] == "purged"
     assert store.is_cancel_requested(job)                                     # a purged row counts as cancelled
-    assert JobStore().requeue_orphans("worker-B") == []
+    assert JobStore().requeue_orphans("worker-B") == ([], [])
     assert client.get(f"/v1/jobs/{job}").status_code == 404
     # a cancel pending when the worker died is finished on restart instead of being re-run
     job2 = client.post("/v1/jobs", json={"prompt": "a stylized cargo crate"}).json()["job_id"]
     store.claim_next("w")
     client.post(f"/v1/jobs/{job2}/cancel")
-    assert JobStore().requeue_orphans("worker-C") == []
+    requeued, cancelled = JobStore().requeue_orphans("worker-C")
+    assert requeued == [] and cancelled == [job2]
     assert client.get(f"/v1/jobs/{job2}").json()["status"] == "cancelled"
+
+
+def _fake_runners(monkeypatch, health_for, cancelled: list):
+    import studio.worker as worker
+
+    class Fake:
+        def __init__(self, name):
+            self.name = name
+
+        def health(self):
+            return health_for(self.name)
+
+        def cancel_current(self):
+            cancelled.append(self.name)
+            return {"cancelled": "run"}
+
+    monkeypatch.setattr(worker, "Runner", Fake)
+
+
+def test_recover_cancels_runners_when_restart_only_finishes_cancels(env, monkeypatch):
+    """Pending cancels return no requeued ids; their stage processes must still be stopped."""
+    client, api, _ = env
+    from studio import config
+    from studio.db import JobStore
+    from studio.worker import _recover
+
+    job = client.post("/v1/jobs", json={"prompt": "a stylized cargo crate"}).json()["job_id"]
+    JobStore().claim_next("w")
+    assert client.post(f"/v1/jobs/{job}/cancel").json()["result"] == "cancelling"
+    stage = config.JOBS_DIR / job / "stages" / "pixal3d"
+    stage.mkdir(parents=True)
+    (stage / "run.json").write_text(json.dumps({"run_id": "still-going"}), encoding="utf-8")
+    cancelled = []
+    _fake_runners(monkeypatch, lambda name: {"busy": name == "pixal3d", "run_id": "still-going"}, cancelled)
+    _recover(JobStore(), "worker-B")
+    assert cancelled == ["pixal3d"]
+    assert client.get(f"/v1/jobs/{job}").json()["status"] == "cancelled"
+
+
+def test_recover_keeps_requeued_run_and_ignores_idle_restart(env, monkeypatch):
+    client, api, _ = env
+    from studio import config
+    from studio.db import JobStore
+    from studio.worker import _recover
+
+    job = client.post("/v1/jobs", json={"prompt": "a stylized cargo crate"}).json()["job_id"]
+    JobStore().claim_next("w")
+    stage = config.JOBS_DIR / job / "stages" / "pixal3d"
+    stage.mkdir(parents=True)
+    (stage / "run.json").write_text(json.dumps({"run_id": "keep-me"}), encoding="utf-8")
+    cancelled = []
+
+    def health_for(name):
+        if name == "pixal3d":
+            return {"busy": True, "run_id": "keep-me"}
+        if name == "image":
+            return {"busy": True, "run_id": "orphan"}
+        return {"busy": False}
+
+    _fake_runners(monkeypatch, health_for, cancelled)
+    _recover(JobStore(), "worker-B")
+    assert cancelled == ["image"]
+    assert JobStore().get(job)["status"] == "queued"
+
+    cancelled.clear()
+    _recover(JobStore(), "worker-C")  # nothing left running: do not touch runners
+    assert cancelled == []
