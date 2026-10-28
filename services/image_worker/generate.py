@@ -110,7 +110,13 @@ def load_generator(model_id: str, gpu_resident_blocks: int, lightning: dict | No
     kw = {}
     if lightning:
         kw["scheduler"] = lightning_scheduler()
-    pipe = QwenImagePipeline.from_pretrained(model_id, transformer=transformer, text_encoder=None, tokenizer=None, torch_dtype=torch.bfloat16, **kw)
+    # diffusers >= 0.40 keeps CPU-offloaded blocks on the meta device; loading the VAE through the same pipeline call
+    # then fails in `.to("cuda")` ("Cannot copy out of meta tensor"). Load it on its own and hand it over (issue #3).
+    from diffusers import AutoencoderKLQwenImage
+
+    vae = AutoencoderKLQwenImage.from_pretrained(model_id, subfolder="vae", torch_dtype=torch.bfloat16)
+    pipe = QwenImagePipeline.from_pretrained(model_id, transformer=transformer, vae=vae, text_encoder=None, tokenizer=None,
+                                             torch_dtype=torch.bfloat16, **kw)
     if lightning:
         from huggingface_hub import snapshot_download
 

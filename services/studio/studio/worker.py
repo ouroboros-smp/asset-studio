@@ -19,12 +19,16 @@ LANE_KINDS = {"image": "image", "asset": "asset"}
 
 
 def _recover(store: JobStore, worker_id: str):
-    requeued = store.requeue_orphans(worker_id)
-    if not requeued:
+    requeued, cancelled = store.requeue_orphans(worker_id)
+    if not requeued and not cancelled:
         return
-    print(f"[worker] requeued {len(requeued)} interrupted job(s): {requeued}", flush=True)
+    if requeued:
+        print(f"[worker] requeued {len(requeued)} interrupted job(s): {requeued}", flush=True)
+    if cancelled:
+        print(f"[worker] finished {len(cancelled)} in-flight cancel(s) at restart: {cancelled}", flush=True)
     # Stage subprocesses started by the previous worker may still be running. Keep the ones a requeued job will
-    # re-attach to (their run.json names the run id); cancel anything else that is busy.
+    # re-attach to (their run.json names the run id); cancel anything else that is busy, including a stage whose
+    # job was only marked cancelled (that list can be non-empty while `requeued` is empty).
     keep = set()
     for jid in requeued:
         for rf in (config.JOBS_DIR / jid / "stages").glob("*/run.json"):

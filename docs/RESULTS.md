@@ -137,7 +137,7 @@ Lightning 4 vs 8 share seeds, so the compositions match and the difference is de
   full Pixal3D stage).
 * **Offline:** every worker runs with `HF_HUB_OFFLINE=1`; the Pixal3D and Qwen loaders were verified with
   `docker run --network none`.
-* **Mocked error paths:** `tests/test_api_mock.py` (9 tests): invalid inputs, auth, cancel, artifact path confinement,
+* **Mocked error paths:** `tests/test_api_mock.py` + `tests/test_portal_mock.py` (20 tests): invalid inputs, auth, cancel, artifact path confinement,
   orphan requeue, stage resume + OOM fallback policy, retry, prompt rules, GLB validation incl. WebP rejection.
 * **External checks:** Khronos glTF validator (`tools/validate_gltf.js`): 0 errors on all 15 produced GLBs (one info-level
   warning about runtime tangent generation on normal-mapped meshes); headless Godot 4.7.2 import (`tools/godot_import_test.py`)

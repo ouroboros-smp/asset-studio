@@ -382,7 +382,8 @@ class JobRun:
         log_path = d / "log.txt"
         self.log(f"Pixal3D {req['mode']} generation at {px['resolution']} (low_vram={px['low_vram']}), master export "
                  f"{master['decimation_target']} tris / {master['texture_size']}px")
-        run = self._run_gpu_stage("pixal3d", name, ["python", "-m", "pixal3d_worker.generate", "--request", str(d / "request.json")],
+        # submit hands the job to the resident session in the pixal3d-worker container (or runs it in-process)
+        run = self._run_gpu_stage("pixal3d", name, ["python", "-m", "pixal3d_worker.submit", "--request", str(d / "request.json")],
                                   log_path, ["pixal3d", "master"])
         out = json.loads((d / "output.json").read_text(encoding="utf-8"))
         shutil.copy2(d / out["master_glb"], self.art / "master.glb")
@@ -448,7 +449,7 @@ class JobRun:
             "require_basecolor": True, "height_m": opt.get("height_m"), "max_texture": opt["texture_size"],
             "require_bottom_origin": True})
         for i, lod in enumerate(outputs.get("lods", [])):
-            reports[f"lod{i+1}"] = validate_glb(self.art / lod["file"], {"max_triangles": int(lod["target_triangles"] * 1.1),
+            reports[f"lod{i+1}"] = validate_glb(self.art / lod["file"], {"soft_max_triangles": int(lod["target_triangles"] * 1.1),
                                                                         "require_uv": True, "require_material": True})
         if outputs.get("collision_glb"):
             reports["collision"] = validate_glb(self.art / outputs["collision_glb"], {"max_triangles": int(opt["collision_triangles"] * 1.2)})

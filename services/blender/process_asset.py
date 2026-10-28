@@ -656,7 +656,7 @@ def mo_decimate(obj, target: int, error_ladder=(0.01, 0.03, 0.05)) -> dict:
             "simplifier": "meshoptimizer.simplifyWithAttributes(normals w=0.7, PRUNE)"}
 
 
-def lod_from_asset(asset, target: int, error_ladder=(0.01, 0.03, 0.05, 0.1, 0.2, 0.35)) -> dict:
+def lod_from_asset(asset, target: int, error_ladder=(0.01, 0.03, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0)) -> dict:
     """Simplify the optimized asset while preserving its UV layout (meshoptimizer with UV+normal attributes on the
     UV-split vertex set), so LODs reuse LOD0's textures and material: no re-unwrap, no re-bake, one texture set."""
     import ctypes
@@ -703,7 +703,9 @@ def lod_from_asset(asset, target: int, error_ladder=(0.01, 0.03, 0.05, 0.1, 0.2,
                 v.ctypes.data_as(C.POINTER(C.c_float)), len(v), 12,
                 attrs.ctypes.data_as(C.POINTER(C.c_float)), 20, weights.ctypes.data_as(C.POINTER(C.c_float)), 5,
                 None, target_idx, float(err), int(mo.SIMPLIFY_PRUNE), C.byref(res_err))
-        if n < 36:  # collapsed to nothing: keep the previous result
+        # Loose error bounds on a small mesh can collapse it far below the target (or to nothing): only accept a
+        # result that stays within reach of the target; otherwise keep the previous rung.
+        if n < 36 or (err > 0.35 and n < target_idx * 0.5):
             break
         best = (dest[:n].copy(), float(res_err.value), err)
         if n <= target_idx * 1.05:
@@ -1063,7 +1065,7 @@ def main():
                                     "maps": "shared_with_asset (UVs preserved)", "reduction": info, **mesh_report(lod)})
             if info["triangles"] > lod_target * 1.1:
                 WARN.append(f"LOD{i} stopped at {info['triangles']} triangles (budget {lod_target}): further UV-preserving "
-                            f"collapse would exceed a 35% error bound")
+                            f"collapse would collapse the mesh (small budgets: LODs are best-effort)")
             if prev is not asset:
                 bpy.data.objects.remove(prev, do_unlink=True)
             prev = lod

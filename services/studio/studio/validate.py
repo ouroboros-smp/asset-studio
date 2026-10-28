@@ -158,6 +158,10 @@ def validate_glb(path: str | Path, expect: dict | None = None) -> dict:
     # expectations
     if "max_triangles" in expect and tri_total > expect["max_triangles"]:
         rep["errors"].append(f"triangles {tri_total} exceed budget {expect['max_triangles']}")
+    if "soft_max_triangles" in expect and tri_total > expect["soft_max_triangles"]:
+        # LODs: the reducer stops before the target when further UV-preserving collapse would distort the mesh;
+        # that is reported, not fatal (the LOD0 asset itself is held to its budget strictly)
+        rep["warnings"].append(f"triangles {tri_total} exceed budget {expect['soft_max_triangles']} (reducer stopped early)")
     if expect.get("require_uv") and any(not m["has_uv"] for m in meshes):
         rep["errors"].append("a primitive has no TEXCOORD_0")
     if expect.get("require_material") and (not mats or any(m["material"] is None for m in meshes)):

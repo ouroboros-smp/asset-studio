@@ -115,7 +115,7 @@ def create_job(req: JobRequest):
     """One-shot: prompt -> auto-selected reference -> 3D asset (the original agent path)."""
     data = req.model_dump()
     if not data.get("model"):
-        data["model"] = store().get_settings().get("default_image_model", "qwen-image-2512-lightning-8")
+        data["model"] = store().get_settings().get("default_image_model", "flux2-klein-9b")
     try:
         settings = resolve_settings(data)
     except ValueError as e:
@@ -130,7 +130,7 @@ def create_image_job(req: ImageJobRequest):
     data = req.model_dump()
     data["quality"] = "balanced"
     if not data.get("model"):
-        data["model"] = store().get_settings().get("default_image_model", "qwen-image-2512-lightning-8")
+        data["model"] = store().get_settings().get("default_image_model", "flux2-klein-9b")
     try:
         settings = resolve_settings(data)
     except ValueError as e:
@@ -334,7 +334,11 @@ def patch_job(job_id: str, body: JobPatch):
 def delete_job(job_id: str, purge: bool = False):
     j = _get_job(job_id)
     if j["status"] == "running":
-        raise HTTPException(409, "cancel the job first")
+        if not (purge and j.get("cancel_requested")):
+            raise HTTPException(409, "cancel the job first")
+        # cancel is in flight: finish it here so no worker can ever re-claim the row; the running stage stops at its
+        # next cancel check (a missing row counts as cancelled) and its process is torn down by the runner
+        store().update(job_id, status="cancelled", stage="cancelled", finished_at=time.time())
     if purge:
         d = (config.JOBS_DIR / job_id).resolve()
         if config.JOBS_DIR.resolve() in d.parents and d.exists():

@@ -5,7 +5,7 @@ import json, sys, time, urllib.request, uuid, os, shutil
 from pathlib import Path
 
 API = os.environ.get("COMFY_URL", "http://127.0.0.1:8188")
-OUT = Path(os.environ.get("COMFY_OUTPUT", "C:/Users/Zorro/comfyui-docker-mcp/storage/output"))
+OUT = Path(os.environ.get("COMFY_OUTPUT", "comfyui/output"))  # set COMFY_OUTPUT to your ComfyUI output folder
 DEST = Path(os.environ.get("BENCH_DEST", "bench-out/qwen2512"))
 DEST.mkdir(parents=True, exist_ok=True)
 PROMPT = open(os.path.join(os.path.dirname(__file__), "prompt_toaster.txt"), encoding="utf-8").read().strip()

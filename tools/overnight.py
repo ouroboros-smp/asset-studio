@@ -42,7 +42,7 @@ COZY = [
     ("Rocking chair", "wooden rocking chair with a knitted cushion and a folded blanket on the seat", "warm oak wood, wool knit", ["honey oak", "cream", "sage green"], 1.1, 12000),
     ("Reading armchair", "overstuffed reading armchair with a rolled back and a small throw pillow", "velvet upholstery, wood legs", ["dusty rose", "walnut", "cream"], 1.0, 14000),
     ("Wood stove", "small cast-iron wood stove with a kettle on top and a stovepipe", "cast iron, copper kettle", ["charcoal", "copper", "brick red"], 1.2, 14000),
-    ("Stone fireplace", "cottage stone fireplace with a wooden mantel, stacked logs beside it", "fieldstone, oak mantel", ["warm grey stone", "oak", "ember orange"], 1.8, 20000),
+    ("Stone fireplace", "cottage stone fireplace with a wooden mantel and logs stacked in its side nook", "fieldstone, oak mantel", ["warm grey stone", "oak", "ember orange"], 1.8, 20000),
     ("Bookshelf", "short wooden bookshelf packed with books of different sizes and a potted plant on top", "pine wood, paper", ["pine", "teal", "mustard", "cream"], 1.4, 16000),
     ("Kitchen table", "round farmhouse kitchen table with a checked tablecloth and a bowl of apples", "painted wood, cotton cloth", ["cream", "red check", "green apple"], 0.8, 12000),
     ("Kitchen chair", "simple painted farmhouse kitchen chair with a woven rush seat", "painted wood, rush", ["sage green", "straw"], 0.9, 8000),
@@ -59,7 +59,7 @@ COZY = [
     ("Dresser", "small chest of drawers with round wooden knobs and a lace runner on top", "painted wood, lace", ["powder blue", "cream", "oak"], 1.0, 10000),
     ("Vanity mirror", "oval standing vanity mirror in a carved wooden frame", "carved wood, mirror glass", ["walnut", "gold accent"], 1.5, 8000),
     ("Bathtub", "clawfoot bathtub with a wooden tray and a folded towel", "enamelled iron, wood", ["white enamel", "copper feet", "oak"], 0.7, 10000),
-    ("Garden bench", "wooden garden bench with a curved back under a small climbing rose", "weathered wood, rose vine", ["driftwood grey", "leaf green", "pink"], 0.9, 12000),
+    ("Garden bench", "wooden garden bench with a curved back and a small climbing rose wound around one armrest", "weathered wood, rose vine", ["driftwood grey", "leaf green", "pink"], 0.9, 12000),
     ("Wishing well", "small stone wishing well with a shingled roof and a bucket on a rope", "fieldstone, wood shingles, rope", ["warm stone", "moss green", "oak"], 2.0, 16000),
     ("Birdhouse", "birdhouse on a wooden post with a tiny round door and a shingled roof", "painted wood", ["cream", "teal roof", "oak post"], 1.8, 6000),
     ("Mailbox", "rounded countryside mailbox on a wooden post with a little flag", "painted metal, wood post", ["red", "cream", "oak"], 1.2, 6000),
@@ -67,7 +67,7 @@ COZY = [
     ("Watering can", "rounded tin watering can with a long spout and a rose head", "painted tin", ["sage green", "brass"], 0.35, 6000),
     ("Garden gnome", "cheerful garden gnome with a pointed hat holding a tiny lantern", "painted ceramic", ["red hat", "blue coat", "beige"], 0.45, 8000),
     ("Flower cart", "small wooden flower cart with buckets of tulips and daisies", "wood, tin buckets, flowers", ["cream", "yellow", "pink", "green"], 1.3, 16000),
-    ("Beehive", "traditional skep beehive on a wooden stand with a few flowers around the base", "straw, wood", ["straw", "oak", "lavender"], 0.9, 10000),
+    ("Beehive", "traditional skep beehive on a short wooden stand", "straw, wood", ["straw", "oak", "lavender"], 0.9, 10000),
     ("Rain barrel", "wooden rain barrel with a small tap and a tin cup hanging on it", "oak staves, iron hoops", ["oak", "dark iron"], 1.0, 8000),
     ("Vegetable planter", "raised wooden planter box with rows of lettuce and carrots", "pine, soil, vegetables", ["pine", "leaf green", "carrot orange"], 0.6, 12000),
     ("Greenhouse", "small cottage greenhouse with a peaked glass roof and potted plants inside", "painted wood frame, glass", ["cream", "leaf green", "terracotta"], 2.6, 20000),
@@ -95,8 +95,8 @@ COZY = [
     ("Hot cocoa mug", "big ceramic mug of hot cocoa with marshmallows on a small saucer", "glazed ceramic", ["dusty blue", "cocoa brown", "white"], 0.15, 5000),
     ("Pumpkin pile", "pile of pumpkins of different sizes with a few autumn leaves", "pumpkin skin, leaves", ["orange", "cream", "green", "red leaf"], 0.6, 10000),
     ("Scarecrow", "friendly scarecrow with a straw hat and a patched shirt on a wooden pole", "straw, cloth, wood", ["straw", "blue shirt", "brown"], 2.0, 12000),
-    ("Log pile", "neatly stacked pile of firewood logs under a small wooden shelter", "birch logs, wood", ["birch white", "oak"], 1.4, 12000),
-    ("Axe stump", "wood-chopping stump with an axe stuck in it", "wood, steel axe", ["oak", "steel"], 0.6, 6000),
+    ("Log pile", "small wooden firewood shelter filled with neatly stacked logs", "birch logs, wood", ["birch white", "oak"], 1.4, 12000),
+    ("Axe stump", "wood-chopping stump with an axe stuck in the top", "wood, steel axe", ["oak", "steel"], 0.6, 6000),
     ("Water pump", "old-fashioned cast-iron hand water pump with a wooden bucket", "cast iron, wood", ["dark green iron", "oak"], 1.3, 8000),
     ("Village fountain", "small round stone village fountain with a central spout", "carved stone, water", ["warm stone", "blue water"], 1.5, 14000),
     ("Wooden bridge", "small arched wooden footbridge with rope handrails", "wood planks, rope", ["oak", "rope beige"], 1.2, 12000),
@@ -117,7 +117,7 @@ COZY = [
     ("Bicycle", "vintage bicycle with a wicker basket of flowers", "painted steel, wicker", ["mint", "wicker", "pink"], 1.1, 12000),
     ("Wicker basket", "round wicker picnic basket with a checked cloth and a baguette", "wicker, cloth, bread", ["wicker", "red check", "golden"], 0.35, 8000),
     ("Picnic table", "wooden picnic table with attached benches and a lemonade jug", "wood, glass", ["oak", "lemon yellow"], 0.8, 12000),
-    ("Hammock", "rope hammock between two wooden posts with a blanket", "rope, wood, wool", ["rope beige", "oak", "rust red"], 1.4, 10000),
+    ("Hammock", "rope hammock on a wooden hammock stand with a folded blanket", "rope, wood, wool", ["rope beige", "oak", "rust red"], 1.4, 10000),
     ("Campfire", "small campfire ring of stones with logs and a hanging cooking pot on a tripod", "stone, wood, iron", ["grey stone", "oak", "ember orange"], 1.0, 12000),
     ("Tent", "small canvas camping tent with a rolled-up door flap", "canvas, wood poles, rope", ["cream canvas", "oak", "rope"], 1.6, 10000),
     ("Sleeping bag", "rolled sleeping bag with a leather strap", "quilted fabric, leather", ["forest green", "tan"], 0.3, 5000),
@@ -135,7 +135,7 @@ COZY = [
     ("Wall clock", "round wooden wall clock with a blank face and a small pendulum", "wood, brass", ["oak", "cream", "brass"], 0.5, 6000),
     ("Coat rack", "wooden standing coat rack with a hat, scarf and umbrella", "wood, felt, fabric", ["walnut", "red scarf", "grey hat"], 1.8, 10000),
     ("Umbrella stand", "ceramic umbrella stand with two umbrellas and a walking cane", "ceramic, fabric, wood", ["blue ceramic", "yellow", "oak"], 0.8, 8000),
-    ("Welcome mat", "coiled rope doormat with a pair of boots beside it", "rope, leather", ["rope beige", "brown leather"], 0.3, 6000),
+    ("Welcome mat", "coiled rope doormat with a pair of boots standing on it", "rope, leather", ["rope beige", "brown leather"], 0.3, 6000),
     ("Boots", "pair of muddy leather boots with wool socks folded over", "leather, wool", ["brown", "cream"], 0.35, 6000),
     ("Cat bed", "round cat bed with a sleeping cat curled inside", "fabric, fur", ["cream", "ginger"], 0.3, 8000),
     ("Dog house", "small wooden dog house with a rounded door and a food bowl", "painted wood, shingles", ["red", "cream", "steel bowl"], 1.0, 10000),
@@ -234,13 +234,41 @@ def main():
     ap.add_argument("--report", default=str(HERE / "overnight_report.md"))
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--status", action="store_true", help="print progress, in-flight jobs and the GPU state, then exit")
+    ap.add_argument("--resubmit-failed", action="store_true", help="forget failed items so they are generated again")
     a = ap.parse_args()
 
     catalog = [tuple(x) for x in json.loads(Path(a.catalog).read_text(encoding="utf-8"))] if a.catalog else list(COZY)
     names = [c[0] for c in catalog]
     assert len(names) == len(set(names)), "catalog names must be unique"
+    scene_words = (" between ", " beside ", " next to ", " under a ", " around the base")
+    for c in catalog:  # the pipeline wants exactly one object; warn about prompts that read like a small scene
+        if any(w in " " + c[1] + " " for w in scene_words):
+            print(f"[overnight] note: '{c[0]}' reads like a scene ({c[1][:60]}...); reconstruction prefers one object", flush=True)
     state_path, report_path = Path(a.state), Path(a.report)
     state = load_state(state_path)
+    if a.resubmit_failed and state["failed"]:
+        print(f"[overnight] forgetting {len(state['failed'])} failed item(s): {', '.join(state['failed'])}", flush=True)
+        state["failed"] = {}
+        save_state(state_path, state)
+    if a.status:
+        print(f"done {len(state['done'])}  failed {len(state['failed'])}  in flight {len(state['submitted'])}  "
+              f"catalog {len(catalog)}")
+        for name, rec in state["submitted"].items():
+            try:
+                j = api("GET", f"/v1/jobs/{rec['job_id']}")
+                print(f"  {name:22s} {rec['job_id']} {j['status']} {j.get('stage')} {round((j.get('progress') or 0) * 100)}%")
+            except Exception as e:  # noqa: BLE001
+                print(f"  {name:22s} {rec['job_id']} (api: {e})")
+        for name, rec in list(state["failed"].items())[-5:]:
+            print(f"  failed {name}: {(rec.get('error') or '')[:100]}")
+        try:
+            import subprocess
+            print("  gpu:", subprocess.run(["nvidia-smi", "--query-gpu=memory.used,utilization.gpu", "--format=csv,noheader"],
+                                          capture_output=True, text=True, timeout=10).stdout.strip())
+        except Exception:  # noqa: BLE001
+            pass
+        return
     order = list(catalog)
     random.Random(a.seed).shuffle(order)
     todo = [c for c in order if c[0] not in state["done"] and c[0] not in state["submitted"]]
@@ -294,6 +322,16 @@ def main():
                 est_job_s = 0.7 * est_job_s + 0.3 * el
                 print(f"[overnight] done {name} in {el:.0f}s ({rec['job_id']}) — {len(state['done'])} completed, "
                       f"~{est_job_s:.0f}s/asset, {(deadline - time.time()) / 3600:.1f} h left", flush=True)
+            elif j["status"] == "failed" and not rec.get("retried"):
+                # one retry resumes from the failed stage (completed stages are reused): ~30 s if Blender/validate failed
+                err = (j.get("error") or {}).get("message") if isinstance(j.get("error"), dict) else str(j.get("error"))
+                try:
+                    api("POST", f"/v1/jobs/{rec['job_id']}/retry", {})
+                    rec["retried"] = time.time()
+                    print(f"[overnight] retrying {name} once after: {(err or '')[:120]}", flush=True)
+                except Exception as e:  # noqa: BLE001
+                    rec["retried"] = time.time()
+                    print(f"[overnight] retry request failed for {name}: {e}", flush=True)
             elif j["status"] in ("failed", "cancelled"):
                 err = (j.get("error") or {}).get("message") if isinstance(j.get("error"), dict) else str(j.get("error"))
                 state["failed"][name] = {"job_id": rec["job_id"], "finished": time.time(), "error": err}

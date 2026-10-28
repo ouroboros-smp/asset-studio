@@ -183,7 +183,7 @@ Ready-made request bodies: [`examples/pump_station.json`](examples/pump_station.
 ```powershell
 pip install "mcp>=1.2"
 python mcp\server.py
-# Claude Code:  claude mcp add asset-studio -- python C:/Users/Zorro/asset-studio/mcp/server.py
+# Claude Code:  claude mcp add asset-studio -- python <path-to-repo>/mcp/server.py
 ```
 
 Tools: `capabilities`, `generate`, `status`, `wait`, `artifacts`, `download`, `manifest`, `cancel`, `retry`,
@@ -294,7 +294,17 @@ errors and import into headless Godot 4.7.2.
   and no multi-view job has been run. There is no automatic novel-view generation.
 * **Godot 4.7.2 import is tested**; Unity is not installed on this machine, so it is untested here (the GLBs are
   standard, validator-clean glTF).
-* No license file yet.
+* **LODs are best-effort for small budgets.** Below roughly 8,000 triangles the UV-preserving reducer often stops
+  10–40 % above the LOD1/LOD2 targets rather than distort the mesh; that is reported as a warning in the manifest, not
+  a failure (it used to fail the job: [issue #1](https://github.com/zorrobyte/asset-studio/issues/1)).
+
+## License
+
+The code in this repository is released under the [BSD Zero Clause License](LICENSE) (0BSD): use it for anything,
+commercial or not, with no attribution required. The models it downloads keep their own licences, which apply to what
+you generate with them: Qwen-Image-2512, Z-Image Turbo and FLUX.2 Klein 4B are Apache-2.0; FLUX.2 Klein 9B is under the
+FLUX non-commercial licence; Pixal3D / TRELLIS.2 and RMBG-2.0 have their own terms on Hugging Face. Check those before
+shipping assets from a given model.
 
 ## Project layout
 

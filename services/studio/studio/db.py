@@ -60,7 +60,7 @@ MIGRATIONS = [
 DEFAULT_SETTINGS = {
     "auto_process": False,       # selected images start 3D generation immediately (else they are held for review)
     "default_variations": 4,
-    "default_image_model": "qwen-image-2512-lightning-8",
+    "default_image_model": "flux2-klein-9b",
     "default_quality": "balanced",
     "default_style": "mobile_factory",
     "default_target_triangles": 20000,
@@ -225,16 +225,26 @@ class JobStore:
                       "attempt=attempt+1 WHERE id=?", (now, now, worker_id, row["id"]))
         return self.get(row["id"])
 
-    def requeue_orphans(self, worker_id: str) -> list[str]:
-        """On worker start: jobs left 'running' by a crashed/restarted worker go back to the queue."""
+    def requeue_orphans(self, worker_id: str) -> tuple[list[str], list[str]]:
+        """On worker start: jobs left 'running' by a crashed/restarted worker go back to the queue.
+
+        Returns (requeued, cancelled). A cancel that was already in flight is finished here and never re-run.
+        Those ids are returned separately: recovery must still stop their stage processes, and an empty requeue
+        list is not the same as "nothing was running"."""
         with self.tx() as c:
-            rows = c.execute("SELECT id FROM jobs WHERE status='running'").fetchall()
-            ids = [r["id"] for r in rows]
+            rows = c.execute("SELECT id, cancel_requested FROM jobs WHERE status='running'").fetchall()
+            ids = [r["id"] for r in rows if not r["cancel_requested"]]
+            dropped = [r["id"] for r in rows if r["cancel_requested"]]
             for i in ids:
                 c.execute("UPDATE jobs SET status='queued', updated_at=? WHERE id=?", (time.time(), i))
+            for i in dropped:  # a cancel was in flight when the worker died: finish the cancel, never re-run it
+                c.execute("UPDATE jobs SET status='cancelled', stage='cancelled', finished_at=?, updated_at=? WHERE id=?",
+                          (time.time(), time.time(), i))
         for i in ids:
             self.event(i, "warn", f"requeued after worker restart ({worker_id}); completed stages will be reused")
-        return ids
+        for i in dropped:
+            self.event(i, "warn", f"cancelled (cancel was pending when the worker restarted: {worker_id})")
+        return ids, dropped
 
     def update(self, job_id: str, **fields):
         cols, vals = [], []
@@ -283,7 +293,7 @@ class JobStore:
 
     def is_cancel_requested(self, job_id: str) -> bool:
         row = self.con.execute("SELECT cancel_requested FROM jobs WHERE id=?", (job_id,)).fetchone()
-        return bool(row and row["cancel_requested"])
+        return row is None or bool(row["cancel_requested"])  # a purged job must stop too
 
     # ---- events ------------------------------------------------------------
     def event(self, job_id: str, level: str, message: str):
